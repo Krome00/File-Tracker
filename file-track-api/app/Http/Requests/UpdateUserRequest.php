@@ -31,8 +31,10 @@ class UpdateUserRequest extends FormRequest
                 'confirmed',
                 Password::min(8)
                     ->letters()
-                    ->symbols(),
-            ]
+                    ->symbols()
+                    ->numbers(),
+            ],
+            'office_id' => 'nullable|exists:offices,id',
         ];
     }
 }

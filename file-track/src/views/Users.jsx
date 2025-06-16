@@ -48,6 +48,7 @@ export default function Users() {
             <th>ID</th>
             <th>Name</th>
             <th>Email</th>
+            <th>Office</th>
             <th>Create Date</th>
             <th>Actions</th>
           </tr>
@@ -68,6 +69,7 @@ export default function Users() {
                 <td>{u.id}</td>
                 <td>{u.name}</td>
                 <td>{u.email}</td>
+                <td>{u.office?.name ?? 'N/A'}</td>
                 <td>{u.created_at}</td>
                 <td>
                   <Link className="btn-edit" to={'/users/' + u.id}>Edit</Link>

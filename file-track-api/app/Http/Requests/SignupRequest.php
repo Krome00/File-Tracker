@@ -34,7 +34,8 @@ class SignupRequest extends FormRequest
                     ->letters()
                     ->symbols()
                     ->numbers()
-            ]
+            ],
+            'office_id' => ['required', 'integer', 'exists:offices,id']
         ];
     }
 }
