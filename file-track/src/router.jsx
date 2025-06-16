@@ -7,9 +7,8 @@ import NotFound from "./views/NotFound";
 import Signup from "./views/Signup";
 import Users from "./views/Users";
 import UserForm from "./views/UserForm";
-import HistoryTable from "./views/HistoryTable.jsx";
-import EquipmentTable from "./views/EquipmentTable.jsx";
-import EquipmentTableForm from './views/EquipmentTableForm.jsx';
+import AllFiles from "./views/AllFiles.jsx";
+import Offices from "./views/Offices";
 const router = createBrowserRouter([
   {
     path: '/',
@@ -36,21 +35,13 @@ const router = createBrowserRouter([
         element: <UserForm key="userUpdate" />
       },
       {
-        path: '/equipments',
-        element: <EquipmentTable/>
+        path: '/all-files',
+        element: <AllFiles/>
       },
       {
-        path: '/equipments/new',
-        element: <EquipmentTableForm />
+        path: "/offices",
+        element: <Offices />
       },
-      { 
-        path: '/history', 
-        element: <HistoryTable /> 
-      },
-      {
-        path: '/equipments/:id/history',
-        element: <HistoryTable/>
-      }
     ]
   },
   {

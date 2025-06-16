@@ -17,7 +17,9 @@ class UserController extends Controller
      */
     public function index()
     {
-        return UserResource::collection(User::query()->orderBy('id', 'desc')->paginate(10));
+        return UserResource::collection(
+            User::with('office')->orderBy('id', 'desc')->paginate(10)
+        );
     }
 
     /**
@@ -43,6 +45,7 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
+        $user->load('office');
         return new UserResource($user);
     }
 
@@ -56,9 +59,12 @@ class UserController extends Controller
     public function update(UpdateUserRequest $request, User $user)
     {
         $data = $request->validated();
-        if (isset($data['password'])) {
+        if (isset($data['password']) && $data['password']) {
             $data['password'] = bcrypt($data['password']);
+        } else {
+            unset($data['password']);
         }
+        unset($data['password_confirmation']);
         $user->update($data);
 
         return new UserResource($user);

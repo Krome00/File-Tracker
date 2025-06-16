@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import axiosClient from "../axios-client.js";
 import { Link } from "react-router-dom";
 import { useStateContext } from "../context/ContextProvider.jsx";
-import EquipmentTableForm from "./EquipmentTableForm";
-import { FaEdit, FaTrash, FaHistory } from 'react-icons/fa';
+import { FaArrowAltCircleUp } from 'react-icons/fa';
 import Pagination from '../components/Pagination';
 // import dummyEquipments from "../dummy/dummyData.js";
 import SearchAndFilter from "../components/SearchAndFilter";
+
 
 export default function EquipmentTable() {
   const [loading, setLoading] = useState(false);
@@ -22,12 +22,12 @@ export default function EquipmentTable() {
 
   const fetchEquipments = () => {
     setLoading(true);
-  axiosClient.get("/equipments")
+  axiosClient.get("/files")
     .then(({ data }) => {
-      setEquipments(data);
+      const reversedData = data.reverse();
+      setEquipments(reversedData);
       setLoading(false);
 
-      // 🔥 Check if currentPage is now too high, adjust if necessary
       const filtered = data.filter(eq =>
         Object.values(eq).some(
           value =>
@@ -47,30 +47,23 @@ export default function EquipmentTable() {
     //   setLoading(false);
     // }, 500);
   };
+  const handleDownload = () =>{
+    axiosClient.get('/report/equipments-with-history')
+    .then(({ data }) => {
+
+        console.log("Download Test")
+      
+    })
+    .catch((error) => {
+      console.error("Failed to fetch data", error);
+    });
+  };
 
   useEffect(() => {
     fetchEquipments();
   }, []);
 
-  const handleAddNew = () => {
-    setSelectedEquipment(null);
-    setShowModal(true);
-  };
 
-  const handleEdit = (equipment) => {
-    setSelectedEquipment(equipment);
-    setShowModal(true);
-  };
-
-  const handleDelete = (equipment) => {
-    if (confirm(`Are you sure you want to delete ${equipment.name}?`)) {
-      axiosClient.delete(`/equipments/${equipment.id}`)
-        .then(() => {
-          setNotification('Equipment deleted successfully.');
-          fetchEquipments();
-        });
-    }
-  };
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedEquipment(null);
@@ -101,34 +94,33 @@ export default function EquipmentTable() {
           marginTop: '2rem',
           marginBottom: '1rem',
         }}
-      >
+        >
+        {/* Left: Search */}
         <SearchAndFilter
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
           selectedFilter={selectedFilter}
           onFilterChange={setSelectedFilter}
         />
-        <button className="btn-add" onClick={handleAddNew}>
-          Add New
-        </button>
+
+        {/* Right: Download */}
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <button className="btn-add" onClick={handleDownload}>
+            Download All
+          </button>
+        </div>
       </div>
       
       <div className="card animated fadeInDown" style={{ overflowX: 'auto', marginTop: "0rem" }}>
         <table>
           <thead>
             <tr>
-              <th>Actions</th>
-              <th>Name of Property</th>
-              <th>Description</th>
-              <th>Plate No.</th>
-              <th>Chassis No.</th>
-              <th>Engine No.</th>
-              <th>Accountable Office</th>
-              <th>Property/Equipment No.</th>
-              <th>Date Acquired</th>
-              <th>Acquisition Cost</th>
-              <th>Date Unserviceable</th>
-              <th>Accountable Officer</th>
+              <th>Document Type</th>
+              <th>Tracking Number</th>
+              <th>Document Title</th>
+              <th>Date Created</th>
+              <th>Status</th>
+              <th>Office Forwared/Received</th>
             </tr>
           </thead>
 
@@ -138,30 +130,19 @@ export default function EquipmentTable() {
             </tbody>
           ) : (
             <tbody>
-              {/*equipments*/paginatedEquipments.map((eq) => (
-                <tr key={eq.id}>
+              {allfiles.map((data) => (
+                <tr key={data.id}>
                   <td>
-                    <button onClick={() => handleEdit(eq)} title="Edit" style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
-                      <FaEdit />
-                    </button>
-                    <Link to={`/equipments/${eq.id}/history`} title="History" style={{ margin: '0 10px' }}>
-                      <FaHistory />
+                    <Link to={`/`} title="Track File" style={{ margin: '0 10px' }}>
+                      <FaArrowAltCircleUp />
                     </Link>
-                    <button onClick={() => handleDelete(eq)} title="Delete" style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
-                      <FaTrash />
-                    </button>
                   </td>
-                  <td>{eq.name}</td>
-                  <td className="truncate-cell">{eq.description}</td>
-                  <td>{eq.plate_no}</td>
-                  <td>{eq.chassis_no}</td>
-                  <td>{eq.engine_no}</td>
-                  <td>{eq.accountable_office}</td>
-                  <td>{eq.property_no}</td>
-                  <td>{eq.date_acquired}</td>
-                  <td>{eq.acquisition_cost}</td>
-                  <td>{eq.date_unserviceable}</td>
-                  <td>{eq.accountable_officer}</td>
+                  <td>{data.doc_type}</td>
+                  <td>{data.track_no}</td>
+                  <td>{data.doc_title}</td>
+                  <td>{data.date_created}</td>
+                  <td>{data.status}</td>
+                  <td>{data.office}</td>
                 </tr>
               ))}
             </tbody>
@@ -173,21 +154,6 @@ export default function EquipmentTable() {
         totalPages={totalPages}
         onPageChange={setCurrentPage}
       />
-      {showModal && (
-        <div className="modal">
-          <div className="modal-content">
-            <button onClick={handleCloseModal} className="modal-close">X</button>
-            <EquipmentTableForm
-              initialData={selectedEquipment}
-              onClose={handleCloseModal}
-              onSaved={() => {
-                handleCloseModal();
-                fetchEquipments();
-              }}
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 }
